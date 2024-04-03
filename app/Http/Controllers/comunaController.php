@@ -26,7 +26,10 @@ class comunaController extends Controller
      */
     public function create()
     {
-       
+       $municipio=DB::table('tb_municipio')
+       ->orderBy('muni_nomb')
+       ->get();
+       return view('comuna.new',['municipios'=>$municipio]);
     }
 
     /**
@@ -34,7 +37,7 @@ class comunaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**
