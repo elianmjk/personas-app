@@ -37,7 +37,16 @@ class comunaController extends Controller
      */
     public function store(Request $request)
     {
-        
+        $comuna =new comuna();
+        $comuna->comu_nomb=$request->name;
+        $comuna->muni_code=$request->code;
+        $comuna->save();
+
+        $comunas=DB::table('tb_comuna')
+        -> join('tb_municipio','tb_comuna.muni_codi','=','tb_municipio.muni_codi')
+        ->select('tb_comuna.*','tb_municipio.muni_nomb')
+        ->get();
+        return view('comuna.index',['comunas'=>$comunas]);
     }
 
     /**
@@ -67,8 +76,25 @@ class comunaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+         // Eliminar el registro de la tabla 'tb_comuna' usando 'comu_codi' como condición
+    $deleted = DB::table('tb_comuna')->where('comu_codi', $id)->delete();
+
+    // Verificar si se eliminó correctamente
+    if ($deleted) {
+        // Si se eliminó correctamente, obtener las comunas actualizadas
+        $comunas = DB::table('tb_comuna')
+            ->join('tb_municipio', 'tb_comuna.muni_codi', '=', 'tb_municipio.muni_codi')
+            ->select('tb_comuna.*', 'tb_municipio.muni_nomb')
+            ->get();
+
+        // Retornar la vista con las comunas actualizadas
+        return view('comuna.index', ['comunas' => $comunas]);
+    } else {
+        // Si no se pudo eliminar, redireccionar de vuelta con un mensaje de error
+        return redirect()->back()->with('error', 'No se pudo eliminar la comuna.');
+    }
+
     }
 }
